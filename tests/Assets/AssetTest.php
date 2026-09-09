@@ -63,6 +63,27 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_finds_an_asset_by_url()
+    {
+        $asset = Facades\Asset::findByUrl('/assets/a.jpg');
+
+        $this->assertInstanceOf(Asset::class, $asset);
+        $this->assertSame('test::a.jpg', $asset->id());
+    }
+
+    #[Test]
+    public function it_finds_an_asset_by_an_encoded_url()
+    {
+        Storage::disk('test')->put('my folder/image (1).jpg', '');
+        Facades\Asset::make()->container('test')->path('my folder/image (1).jpg')->save();
+
+        $asset = Facades\Asset::findByUrl('/assets/my%20folder/image%20%281%29.jpg');
+
+        $this->assertInstanceOf(Asset::class, $asset);
+        $this->assertSame('test::my folder/image (1).jpg', $asset->id());
+    }
+
+    #[Test]
     public function it_loads_from_asset_model()
     {
         $model = new AssetModel([
